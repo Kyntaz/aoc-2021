@@ -28,3 +28,8 @@ This input is fed to the main prolog file through the `stdin`.
 
 
 The folder `./common` contains prolog files with generally useful predicates and can be included to make life easier.
+
+## Requirements
+
+* SWI-Prolog
+* PowerShell *(Optional)*
