@@ -1,4 +1,11 @@
-% > Reading from stdin <
+/** 
+ * Utils for reading from stdin
+ * 
+ * read_lines/1
+ * read_non_empty_lines/1
+ * read_grid/1
+ * read_blocks/1
+*/
 
 /** 
  * read_lines(-Lines:list[string]) is semidet
@@ -46,7 +53,15 @@ aux_read_blocks([Line|Lines], TempBlock, TempBlocks, Blocks) :- !,
     append(TempBlock, [Line], NewTempBlock),
     aux_read_blocks(Lines, NewTempBlock, TempBlocks, Blocks).
 
-%  > Math <
+/** 
+ * Utils for maths and calculations
+ * 
+ * calc/4
+ * operatorium/3
+ * summatorium/2
+ * productorium/2
+ * fact/2
+*/
 
 /** 
  * calc(+Op:literal[*,+,-,/], +X:number, +Y:number, -Res:number) is det
@@ -89,7 +104,12 @@ fact(N, Fact) :-
     fact(N1, Fact1),
     Fact is Fact1 * N.
 
-% > Lists <
+/** 
+ * Utils for manipulating lists
+ * 
+ * remove_last/2
+ * replace/4
+*/
 
 /** 
  * remove_last(+List:list[any], -Res:list[any]) is det
@@ -109,7 +129,15 @@ replace(N, O, [E|T1], [E|T2]) :-
     N1 is N - 1,
     replace(N1, O, T1, T2).
 
-% > Conversions <
+/** 
+ * Utils for converting between different data types
+ * 
+ * char_number/5
+ * char_number/2
+ * rev_base_chars_number/3
+ * base_chars_number/3
+ * base_string_number/3
+*/
 
 /** 
  * char_number(
@@ -121,6 +149,7 @@ replace(N, O, [E|T1], [E|T2]) :-
  * ) is det
  * 
  * Turns a character between MinC and MaxC into a number larger than Disp.
+ * Mostly useful as a helper for char_number/2.
 */
 char_number(Char, N, MinC, MaxC, Disp) :-
     char_code(MinC, Min),
