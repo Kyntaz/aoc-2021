@@ -13,24 +13,6 @@ most_common(ListOfBits, Bit) :-
     Le >= Ld, !.
 
 /** 
- * rev_bits_to_number(+ReversedBits, -Number) is det
-*/
-rev_bits_to_number([], 0) :- !.
-rev_bits_to_number(['0' | Bits], Number) :-
-    rev_bits_to_number(Bits, Number1),
-    Number is Number1 * 2.
-rev_bits_to_number(['1' | Bits], Number) :-
-    rev_bits_to_number(Bits, Number1),
-    Number is 1 + Number1 * 2.
-
-/** 
- * bits_to_number(+Bits, -Number) is det
-*/
-bits_to_number(Bits, Number) :-
-    reverse(Bits, RevBits),
-    rev_bits_to_number(RevBits, Number).
-
-/** 
  * flip(?Bit, ?NewBit) is det
 */
 flip('0', '1').
@@ -60,9 +42,9 @@ p1 :-
     read_grid(Bits),
     transpose(Bits, BitsPerPosition),
     maplist(most_common, BitsPerPosition, CommonBits),
-    bits_to_number(CommonBits, Gamma),
+    base_chars_number(2, CommonBits, Gamma),
     maplist(flip, CommonBits, UncommonBits),
-    bits_to_number(UncommonBits, Epsilon),
+    base_chars_number(2, UncommonBits, Epsilon),
     Power is Gamma * Epsilon,
     writeln(Power).
 
@@ -70,7 +52,7 @@ p2 :-
     read_grid(Bits),
     find_number(Bits, false, 0, OxigenBits),
     find_number(Bits, true, 0, ScrubberBits),
-    bits_to_number(OxigenBits, Oxigen),
-    bits_to_number(ScrubberBits, Scrubber),
+    base_chars_number(2, OxigenBits, Oxigen),
+    base_chars_number(2, ScrubberBits, Scrubber),
     Life is Oxigen * Scrubber,
     writeln(Life).
