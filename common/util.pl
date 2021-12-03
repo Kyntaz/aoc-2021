@@ -108,3 +108,64 @@ replace(0, E, [_|T], [E|T]) :- !.
 replace(N, O, [E|T1], [E|T2]) :-
     N1 is N - 1,
     replace(N1, O, T1, T2).
+
+% > Conversions <
+
+/** 
+ * char_number(
+ *      +Char:char,
+ *      -N:number,
+ *      +MinC:char,
+ *      +MaxC:char,
+ *      +Disp:number
+ * ) is det
+ * 
+ * Turns a character between MinC and MaxC into a number larger than Disp.
+*/
+char_number(Char, N, MinC, MaxC, Disp) :-
+    char_code(MinC, Min),
+    char_code(MaxC, Max),
+    char_code(Char, Code),
+    Code >= Min,
+    Code =< Max, !,
+    N is Code - Min + Disp.
+
+/**
+ * char_number(+Char:char, -N:number) is det
+ * 
+ * Chars between 0 and 9 become their corresponding number.
+ * Chars between a/A and z/Z become the corresponding number + 10 (mostly for hexadecimal).
+ */
+char_number(Char, N) :- char_number(Char, N, '0', '9', 0), !.
+char_number(Char, N) :- char_number(Char, N, 'a', 'z', 10), !.
+char_number(Char, N) :- char_number(Char, N, 'A', 'Z', 10), !.
+
+/** 
+ * rev_base_chars_number(+Base:number, +Chars:list[char], -Number:number) is det
+ * 
+ * Turns a reversed list of characters into the corresponding number in base Base.
+ * Mostly useful as a helper for base_chars_number.
+*/
+rev_base_chars_number(_, [], 0) :- !.
+rev_base_chars_number(Base, [Char | Chars], Number) :-
+    rev_base_chars_number(Base, Chars, Number1),
+    char_number(Char, N),
+    Number is Number1 * Base + N.
+
+/** 
+ * base_chars_number(+Base:number, +Chars:list[chars], -Number:number) is det
+ * 
+ * Turns a list of characters into the corresponding number in base Base.
+*/
+base_chars_number(Base, Chars, Number) :-
+    reverse(Chars, RevChars),
+    rev_base_chars_number(Base, RevChars, Number).
+
+/** 
+ * base_string_number(+Base:number, +String:string, -Number:number) is det
+ * 
+ * Turns a string into the corresponding number in base Base.
+*/
+base_string_number(Base, String, Number) :-
+    string_chars(String, Chars),
+    base_chars_number(Base, Chars, Number).
