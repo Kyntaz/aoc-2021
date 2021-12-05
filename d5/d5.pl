@@ -1,5 +1,4 @@
 :- use_module("common/util.pl").
-:- use_module(library(assoc)).
 
 /** 
  * string_to_number_pair(+Str, -Pair)
@@ -25,21 +24,14 @@ read_vents(Vents) :-
     maplist(line_to_vent, Lines, Vents).
 
 /** 
- * xy(?X, ?Y, ?Pair)
- * yx(?Y, ?X, ?Pair)
-*/
-xy(X, Y, (X, Y)).
-yx(Y, X, (X, Y)).
-
-/** 
  * vent_points(+Diags, +Vent, -Points)
 */
 vent_points(_, vent((X1, Y), (X2, Y)), Points) :- !,
     (X1 < X2 -> numlist(X1, X2, Xs) ; numlist(X2, X1, Xs)),
-    maplist(yx(Y), Xs, Points).
+    maplist([X,(X,Y)]>>(true), Xs, Points).
 vent_points(_, vent((X, Y1), (X, Y2)), Points) :- !,
     (Y1 < Y2 -> numlist(Y1, Y2, Ys) ; numlist(Y2, Y1, Ys)),
-    maplist(xy(X), Ys, Points).
+    maplist([Y,(X,Y)]>>(true), Ys, Points).
 vent_points(true, vent((X1, Y1), (X2, Y2)), Points) :-
     (X1 < X2 -> numlist(X1, X2, Xs) ; (
         numlist(X2, X1, RXs),
@@ -49,7 +41,7 @@ vent_points(true, vent((X1, Y1), (X2, Y2)), Points) :-
         numlist(Y2, Y1, RYs),
         reverse(RYs, Ys)
     )),
-    maplist(xy, Xs, Ys, Points), !.
+    maplist([X,Y,(X,Y)]>>(true), Xs, Ys, Points), !.
 vent_points(_, _, []).
 
 /** 
@@ -87,20 +79,18 @@ p1 :-
     read_vents(Vents),
     empty_assoc(EmptyMap),
     mark_vents(false, Vents, EmptyMap, Map),
-    findall(N, (
-        gen_assoc(_, Map, N),
+    aggregate(count, (N, K)^(
+        gen_assoc(K, Map, N),
         N >= 2
-    ), Ns),
-    length(Ns, Overlaps),
+    ), Overlaps),
     writeln(Overlaps).
 
 p2 :-
     read_vents(Vents),
     empty_assoc(EmptyMap),
     mark_vents(true, Vents, EmptyMap, Map),
-    findall(N, (
-        gen_assoc(_, Map, N),
+    aggregate(count, (N, K)^(
+        gen_assoc(K, Map, N),
         N >= 2
-    ), Ns),
-    length(Ns, Overlaps),
+    ), Overlaps),
     writeln(Overlaps).

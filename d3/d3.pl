@@ -13,12 +13,6 @@ most_common(ListOfBits, Bit) :-
     Le >= Ld, !.
 
 /** 
- * flip(?Bit, ?NewBit) is det
-*/
-flip('0', '1').
-flip('1', '0').
-
-/** 
  * criteria(+Idx, +BitsToSelect, +Bits) is semidet
 */
 criteria(Idx, BitsToSelect, Bits) :-
@@ -33,7 +27,10 @@ find_number(Bits, Flip, Idx, Number) :-
     transpose(Bits, BitsPerPosition),
     % This is not very efficient, but the input is small...
     maplist(most_common, BitsPerPosition, CommonBits),
-    (Flip -> maplist(flip, CommonBits, BitsToChoose) ; BitsToChoose = CommonBits),
+    (Flip ->
+        maplist([X,Y]>>((X='0',Y='1') ; (X='1',Y='0')), CommonBits, BitsToChoose) ;
+        BitsToChoose = CommonBits
+    ),
     include(criteria(Idx, BitsToChoose), Bits, FilteredBits),
     Idx1 is Idx + 1,
     find_number(FilteredBits, Flip, Idx1, Number).
@@ -43,7 +40,7 @@ p1 :-
     transpose(Bits, BitsPerPosition),
     maplist(most_common, BitsPerPosition, CommonBits),
     base_chars_number(2, CommonBits, Gamma),
-    maplist(flip, CommonBits, UncommonBits),
+    maplist([X,Y]>>((X='0',Y='1') ; (X='1',Y='0')), CommonBits, UncommonBits),
     base_chars_number(2, UncommonBits, Epsilon),
     Power is Gamma * Epsilon,
     writeln(Power).

@@ -10,7 +10,6 @@
     fact/2,
     remove_last/2,
     replace/4,
-    length_alt/2,
     char_number/5,
     char_number/2,
     rev_base_chars_number/3,
@@ -149,13 +148,6 @@ replace(0, E, [_|T], [E|T]) :- !.
 replace(N, O, [E|T1], [E|T2]) :-
     N1 is N - 1,
     replace(N1, O, T1, T2).
-
-/** 
- * length_alt(?Length, ?List) is semidet
- * 
- * Same as length but with reversed arguments.
-*/
-length_alt(Len, List) :- length(List, Len).
 
 /** 
  * Utils for converting between different data types

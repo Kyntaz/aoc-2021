@@ -28,14 +28,12 @@ sum_window(Measurements, Sum) :-
 
 p1 :-
     read_measurements(Measurements),
-    findall((V1, V2), increase(Measurements, V1, V2), Increments),
-    length(Increments, L),
-    writeln(L).
+    aggregate(count, (V1, V2)^increase(Measurements, V1, V2), Increments),
+    writeln(Increments).
 
 p2 :-
     read_measurements(Measurements),
     % We are taking advantage of the order in which append unifies a sub-list
     findall(Sum, sum_window(Measurements, Sum), Coarse),
-    findall((V1, V2), increase(Coarse, V1, V2), Increments),
-    length(Increments, L),
-    writeln(L).
+    aggregate(count, (V1, V2)^increase(Coarse, V1, V2), Increments),
+    writeln(Increments).
