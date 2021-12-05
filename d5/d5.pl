@@ -1,4 +1,5 @@
 :- use_module("common/util.pl").
+:- use_module(library(assoc)).
 
 /** 
  * string_to_number_pair(+Str, -Pair)
@@ -54,12 +55,10 @@ vent_points(_, _, []).
 /** 
  * mark_point(+Point, +Map, -NewMap)
 */
-mark_point((X, Y), Map, NewMap) :-
-    nth0(Y, Map, Line),
-    nth0(X, Line, N),
-    N1 is N + 1,
-    replace(X, N1, Line, NewLine),
-    replace(Y, NewLine, Map, NewMap).
+mark_point(Point, Map, NewMap) :-
+    (get_assoc(Point, Map, V) ; V = 0),
+    V1 is V + 1,
+    put_assoc(Point, Map, V1, NewMap).
 
 /** 
  * mark_points(+Points, +Map, -NewMap)
@@ -84,31 +83,12 @@ mark_vents(Diags, [Vent | Vents], Map, NewMap) :-
     mark_vent(Diags, Vent, Map, TempMap),
     mark_vents(Diags, Vents, TempMap, NewMap).
 
-/** 
- * make_map(+Vents, -Map)
-*/
-make_map(Vents, Map) :-
-    findall(X, member(vent((X, _), _), Vents), Xs1),
-    findall(X, member(vent(_, (X, _)), Vents), Xs2),
-    max_list(Xs1, MaxX1),
-    max_list(Xs2, MaxX2),
-    W is max(MaxX1, MaxX2) + 1,
-    findall(Y, member(vent((_, Y), _), Vents), Ys1),
-    findall(Y, member(vent(_, (_, Y)), Vents), Ys2),
-    max_list(Ys1, MaxY1),
-    max_list(Ys2, MaxY2),
-    H is max(MaxY1, MaxY2) + 1,
-    length(Map, H),
-    maplist(length_alt(W), Map),
-    maplist(maplist(=(0)), Map).
-
 p1 :-
     read_vents(Vents),
-    make_map(Vents, EmptyMap),
+    empty_assoc(EmptyMap),
     mark_vents(false, Vents, EmptyMap, Map),
     findall(N, (
-        member(Line, Map),
-        member(N, Line),
+        gen_assoc(_, Map, N),
         N >= 2
     ), Ns),
     length(Ns, Overlaps),
@@ -116,11 +96,10 @@ p1 :-
 
 p2 :-
     read_vents(Vents),
-    make_map(Vents, EmptyMap),
+    empty_assoc(EmptyMap),
     mark_vents(true, Vents, EmptyMap, Map),
     findall(N, (
-        member(Line, Map),
-        member(N, Line),
+        gen_assoc(_, Map, N),
         N >= 2
     ), Ns),
     length(Ns, Overlaps),
