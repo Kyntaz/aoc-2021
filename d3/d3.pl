@@ -1,4 +1,4 @@
-:- ["common/util.pl"].
+:- use_module("common/util.pl").
 :- use_module(library(clpfd)).
 
 /** 

@@ -1,3 +1,22 @@
+:- module(util, [
+    read_lines/1,
+    read_non_empty_lines/1,
+    read_grid/1,
+    read_blocks/1,
+    calc/4,
+    operatorium/3,
+    summatorium/2,
+    productorium/2,
+    fact/2,
+    remove_last/2,
+    replace/4,
+    char_number/5,
+    char_number/2,
+    rev_base_chars_number/3,
+    base_chars_number/3,
+    base_string_number/3
+]).
+
 /** 
  * Utils for reading from stdin
  * 
