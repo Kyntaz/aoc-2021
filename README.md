@@ -1,4 +1,4 @@
-# Advent of Code 2021 in Prolog
+# 🦉 Advent of Code 2021 in Prolog
 
 Solutions to the 2021 Advent of Code (https://adventofcode.com/2021/) in SWI-Prolog.
 
@@ -27,7 +27,7 @@ There is also an `input.txt` file which contains the input for the day.
 This input is fed to the main prolog file through the `stdin`.
 
 
-The folder `./common` contains prolog files with generally useful predicates and can be included to make life easier.
+The folder `./common` contains prolog modules with generally useful predicates and can be included to make life easier.
 
 ## Requirements
 
