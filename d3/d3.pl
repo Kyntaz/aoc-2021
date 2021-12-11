@@ -1,9 +1,7 @@
 :- use_module("common/util.pl").
 :- use_module(library(clpfd)).
 
-/** 
- * most_common(+ListOfBits, -Bit) is det
-*/
+%! most_common(+ListOfBits, -Bit)
 most_common(ListOfBits, Bit) :-
     member(Bit, ['1', '0']),
     include(==(Bit), ListOfBits, EqualsList),
@@ -12,16 +10,12 @@ most_common(ListOfBits, Bit) :-
     length(DiffList, Ld),
     Le >= Ld, !.
 
-/** 
- * criteria(+Idx, +BitsToSelect, +Bits) is semidet
-*/
+%! criteria(+Idx, +BitsToSelect, +Bits)
 criteria(Idx, BitsToSelect, Bits) :-
     nth0(Idx, BitsToSelect, Bit),
     nth0(Idx, Bits, Bit).
 
-/** 
- * find_number(+Bits, +Flip:bool, +Idx, -NumberInBits) is semidet
-*/
+%! find_number(+Bits, +Flip:bool, +Idx, -NumberInBits)
 find_number([Number], _, _, Number) :- !.
 find_number(Bits, Flip, Idx, Number) :-
     transpose(Bits, BitsPerPosition),

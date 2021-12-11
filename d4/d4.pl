@@ -1,30 +1,22 @@
 :- use_module("common/util.pl").
 :- use_module(library(clpfd)).
 
-/** 
- * line_to_numbers(+Line, -Numbers) is det
-*/
+%! line_to_numbers(+Line, -Numbers)
 line_to_numbers(Line, Numbers) :-
     split_string(Line, " ", " ", NumbersStr),
     maplist(number_string, Numbers, NumbersStr).
 
-/** 
- * block_to_board(+Block, -Board) is det
-*/
+%! block_to_board(+Block, -Board)
 block_to_board(Block, Board) :- maplist(line_to_numbers, Block, Board).
 
-/** 
- * read_input(-Numbers, -Boards) is semidet
-*/
+%! read_input(-Numbers, -Boards)
 read_input(Numbers, Boards) :-
     read_blocks([[NumbersStr] | BoardBlocks]),
     split_string(NumbersStr, ",", "", NumbersStrs),
     maplist(number_string, Numbers, NumbersStrs),
     maplist(block_to_board, BoardBlocks, Boards).
 
-/** 
- * board_won(+Board) is semidet
-*/
+%! board_won(+Board)
 board_won_aux(Board) :-
     member(Line, Board),
     forall(member(N, Line), N == x), !.
@@ -34,9 +26,7 @@ board_won(Board) :-
     transpose(Board, Transposed),
     board_won_aux(Transposed), !.
 
-/** 
- * play_number(+Number, +Board, -NewBoard) is det
-*/
+%! play_number(+Number, +Board, -NewBoard)
 play_number(Number, Board, NewBoard) :-
     nth0(LineIdx, Board, Line),
     nth0(NIdx, Line, Number), !,
@@ -44,9 +34,7 @@ play_number(Number, Board, NewBoard) :-
     replace(LineIdx, NewLine, Board, NewBoard).
 play_number(_, Board, Board).
 
-/** 
- * board_score(+Board, -Score) is det
-*/
+%! board_score(+Board, -Score)
 board_score(Board, Score) :-
     findall(N, (
         member(Line, Board),
@@ -55,17 +43,14 @@ board_score(Board, Score) :-
     ), Unmarked),
     sum_list(Unmarked, Score).
 
-/** 
- * board_wins(+Numbers,
- *      +InitialTime,
- *      +LastNumber,
- *      +Board,
- *      -Score,
- *      -FinalTime
- * ) is det
- * 
- * If the board doesn't win, Score is -inf and FinalTime is inf.
-*/
+%! board_wins(+Numbers,
+%!     +InitialTime,
+%!     +LastNumber,
+%!     +Board,
+%!     -Score,
+%!     -FinalTime
+%! ) 
+% If the board doesn't win, Score is -inf and FinalTime is inf.
 board_wins([], _, _, _, -inf, inf).
 board_wins(_, Time, LastNumber, Board, Score, Time) :-
     board_won(Board), !,

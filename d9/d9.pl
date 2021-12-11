@@ -1,13 +1,16 @@
 :- use_module("common/util.pl").
 
+%! read_heightmap(-Heightmap)
 read_heightmap(Heightmap) :-
     read_grid(Grid),
     maplist(maplist(char_number), Grid, Heightmap).
 
+%! get_point(+Heightmap, +Point, -Value)
 get_point(Heightmap, (X, Y), Value) :-
     nth0(Y, Heightmap, Line),
     nth0(X, Line, Value).
 
+%! adjacent(+Point, -Adjacent)
 adjacent((X, Y), (X1, Y)) :-
     X1 is X + 1.
 adjacent((X, Y), (X1, Y)) :-
@@ -17,17 +20,10 @@ adjacent((X, Y), (X, Y1)) :-
 adjacent((X, Y), (X, Y1)) :-
     Y1 is Y - 1.
 
-point_in_heightmap(Heightmap, (X, Y)) :-
-    nth0(0, Heightmap, Line),
-    length(Heightmap, H),
-    length(Line, W),
-    H1 is H - 1,
-    W1 is W - 1,
-    numlist(0, H1, Ys),
-    numlist(0, W1, Xs),
-    member(X, Xs),
-    member(Y, Ys).
+%! point_in_heightmap(+Heightmap, +Point)
+point_in_heightmap(Heightmap, Point) :- get_point(Heightmap, Point, _).
 
+%! low_point(+Heightmap, ?Point, -Value)
 low_point(Heightmap, Point, Value) :-
     point_in_heightmap(Heightmap, Point),
     get_point(Heightmap, Point, Value),
@@ -38,6 +34,7 @@ low_point(Heightmap, Point, Value) :-
     maplist(get_point(Heightmap), Adjacents, Values),
     maplist(<(Value), Values).
 
+%! expand_basin(+Heightmap, +Basin, -CompleteBasin)
 expand_basin(Heightmap, Basin, CompleteBasin) :-
     findall(Adj, (
         member(Point, Basin),
@@ -49,6 +46,7 @@ expand_basin(Heightmap, Basin, CompleteBasin) :-
     sort(NewBasinUnsrt, NewBasin),
     (NewBasin = Basin -> CompleteBasin = NewBasin ; expand_basin(Heightmap, NewBasin, CompleteBasin)).
 
+%! find_basin(+Heightmap, +Point, -Basin)
 find_basin(Heightmap, Point, Basin) :-
     expand_basin(Heightmap, [Point], Basin).
 
