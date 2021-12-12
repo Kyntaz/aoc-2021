@@ -1,23 +1,16 @@
 :- use_module("common/util.pl").
-:- dynamic connection/2.
 
 %! read_connection(+Line, -Connection)
-read_connection(Line, (From, To)) :-
+read_connection(Line, From-To) :-
     split_string(Line, "-", "", [From, To]).
 
-%! read_connections(-Connections)
-read_connections(Connections) :-
+%! read_connections(-Graph)
+read_connections(Graph) :-
     read_non_empty_lines(Lines),
-    maplist(read_connection, Lines, Connections).
-
-%! assert_connection(+Connection)
-% Asserts a prolog facts stating that the two caves are connected.
-assert_connection((From, To)) :-
-    assertz(connection(From, To)),
-    assertz(connection(To, From)).
-
-%! assert_connections(+Connections)
-assert_connections(Connections) :- maplist(assert_connection, Connections).
+    maplist(read_connection, Lines, Connections),
+    vertices_edges_to_ugraph([], Connections, UGraph),
+    transpose_ugraph(UGraph, NGraph),
+    ugraph_union(UGraph, NGraph, Graph).
 
 %! small_cave(+Cave)
 small_cave(Cave) :- string_lower(Cave, Cave).
@@ -30,33 +23,32 @@ can_be_visited(Cave, Visited, true) :-
     Cave \= "end",
     no_duplicates(Visited).
 
-%! connected_path(+Visited, -Path, +AllowDup)
-connected_path(_, ["end"], _).
-connected_path(Visited, [From, To | Others], AllowDup) :-
+%! connected_path(+Graph, +Visited, -Path, +AllowDup)
+connected_path(_, _, ["end"], _).
+connected_path(Graph, Visited, [From, To | Others], AllowDup) :-
     From \= "end",
-    connection(From, To),
+    neighbors(From, Graph, Tos),
+    member(To, Tos),
     can_be_visited(To, Visited, AllowDup),
     (small_cave(To) -> 
         append(Visited, [To], NewVisited) ;
         NewVisited = Visited
     ),
-    connected_path(NewVisited, [To | Others], AllowDup).
+    connected_path(Graph, NewVisited, [To | Others], AllowDup).
 
-%! valid_path(-Path, +AllowDup)
-valid_path(Path, AllowDup) :-
-    nth0(0, Path, "start"),
-    connected_path(["start"], Path, AllowDup).
+%! valid_path(+Graph, -Path, +AllowDup)
+valid_path(Graph, Path, AllowDup) :-
+    Path = ["start" | _],
+    connected_path(Graph, ["start"], Path, AllowDup).
 
 p1 :-
-    read_connections(Connections),
-    assert_connections(Connections),
-    findall(Path, valid_path(Path, false), Paths),
+    read_connections(Graph),
+    findall(Path, valid_path(Graph, Path, false), Paths),
     length(Paths, NPaths),
     writeln(NPaths).
 
 p2 :-
-    read_connections(Connections),
-    assert_connections(Connections),
-    findall(Path, valid_path(Path, true), Paths),
+    read_connections(Graph),
+    findall(Path, valid_path(Graph, Path, true), Paths),
     length(Paths, NPaths),
     writeln(NPaths).
