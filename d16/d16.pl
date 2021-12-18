@@ -28,8 +28,8 @@ read_binary(Bin) :-
 
 %! packet(-Packet)//
 packet(num(V, N)) --> version(V), type(4), number_blocks(Blocks), trail, {flatten(Blocks, Bits), base_chars_number(2, Bits, N)}.
-packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(0), n_bit_number(15, N), sub_packets_z(N, SubPackets).
-packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(1), n_bit_number(11, N), sub_packets_o(N, SubPackets).
+packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(0), n_bit_number(15, N), sub_packets_z(N, SubPackets), trail.
+packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(1), n_bit_number(11, N), sub_packets_o(N, SubPackets), trail.
 
 %! version(-V)//
 version(V) --> n_bit_number(3, V).
@@ -92,14 +92,17 @@ value(op(_, 7, Sub), N) :-
     maplist(value, Sub, [N1, N2]),
     (N1 == N2 -> N = 1 ; N = 0).
 
+% Trails leave off many choice points, so we
+% cut them off since there can only be one
+% packet interpretation for each binary.
 p1 :-
     read_binary(Bin),
-    phrase(packet(Packet), Bin, _), !,
+    phrase(packet(Packet), Bin), !,
     sum_version_numbers(Packet, V),
     writeln(V).
 
 p2 :-
     read_binary(Bin),
-    phrase(packet(Packet), Bin, _), !,
+    phrase(packet(Packet), Bin), !,
     value(Packet, V),
     writeln(V).
