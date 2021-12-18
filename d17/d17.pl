@@ -1,7 +1,7 @@
 :- use_module("common/util.pl").
 :- use_module(library(dcg/basics)).
 
-%! target(-XMin, -XMax, -YMin, -YMax) --> Line
+%! target(-XMin, -XMax, -YMin, -YMax)//
 target(XMin, XMax, YMin, YMax) --> "target area: x=", integer(XMin), "..", integer(XMax), ", y=",
     integer(YMin), "..", integer(YMax).
 
@@ -56,7 +56,7 @@ simulate_win(State, XMin, XMax, YMin, YMax, Ch, H) :-
     simulate(State, State1),
     simulate_win(State1, XMin, XMax, YMin, YMax, Ch1, H).
 
-%! good_velocity(-Vx, -Vy, +XMin, +XMax, +YMin, +YMax, -MaxHeight)
+%! good_velocity(-Vx, -Vy, +XMin, +XMax, +YMin, +YMax, -MaxHeight) is multi
 % From the creators of Dr. Shack, The Good Velocity, now on HBO!
 good_velocity(Vx, Vy, XMin, XMax, YMin, YMax, H) :-
     VxMin is 0,

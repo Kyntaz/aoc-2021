@@ -26,38 +26,38 @@ read_binary(Bin) :-
     maplist(string_chars, BinStrs, BinLayered),
     flatten(BinLayered, Bin).
 
-%! packet(-Packet) --> Bits
+%! packet(-Packet)//
 packet(num(V, N)) --> version(V), type(4), number_blocks(Blocks), trail, {flatten(Blocks, Bits), base_chars_number(2, Bits, N)}.
 packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(0), n_bit_number(15, N), sub_packets_z(N, SubPackets).
 packet(op(V, T, SubPackets)) --> version(V), type(T), {T \= 4}, length_type(1), n_bit_number(11, N), sub_packets_o(N, SubPackets).
 
-%! version(-V) --> Bits
+%! version(-V)//
 version(V) --> n_bit_number(3, V).
 
-%! type(-T) --> Bits
+%! type(-T)//
 type(T) --> n_bit_number(3, T).
 
-%! number_blocks(-Blocks) --> Bits
+%! number_blocks(-Blocks)//
 number_blocks([Block]) --> {length(Block, 4)}, ['0' | Block].
 number_blocks([Block | Blocks]) --> {length(Block, 4)}, ['1' | Block], number_blocks(Blocks).
 
-%! length_type(-I) --> Bits
+%! length_type(-I)//
 length_type(0) --> ['0'].
 length_type(1) --> ['1'].
 
-%! n_bit_number(+NBits, -Number) --> Bits
+%! n_bit_number(+NBits, -Number)//
 n_bit_number(L, N) --> {length(Bits, L)}, Bits, {base_chars_number(2, Bits, N)}.
 
-%! sub_packets_z(+NBits, -Packets) --> Bits
+%! sub_packets_z(+NBits, -Packets)//
 sub_packets_z(N, SubPackets) --> {length(Bits, N)}, Bits, {phrase(sub_packets_z_aux(SubPackets), Bits)}.
 sub_packets_z_aux([]) --> [].
 sub_packets_z_aux([Packet | Packets]) --> packet(Packet), sub_packets_z_aux(Packets).
 
-%! sub_packets_o(+NPackets, -Packets) --> Bits
+%! sub_packets_o(+NPackets, -Packets)//
 sub_packets_o(0, []) --> [].
 sub_packets_o(N, [Packet | Packets]) --> {N1 is N - 1}, packet(Packet), sub_packets_o(N1, Packets).
 
-%! trail --> Bits
+%! trail//
 trail --> [].
 trail --> ['0'], trail.
 
