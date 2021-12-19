@@ -37,9 +37,9 @@ cheapest_target(Crabs, Fn, Target, Fuel) :-
 p1 :-
     read_crabs(Crabs),
     cheapest_target(Crabs, move_crab1, _, Fuel),
-    writeln(Fuel).
+    write_answer(Fuel).
 
 p2 :-
     read_crabs(Crabs),
     cheapest_target(Crabs, move_crab2, _, Fuel),
-    writeln(Fuel).
+    write_answer(Fuel).

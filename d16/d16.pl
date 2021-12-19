@@ -99,10 +99,10 @@ p1 :-
     read_binary(Bin),
     phrase(packet(Packet), Bin), !,
     sum_version_numbers(Packet, V),
-    writeln(V).
+    write_answer(V).
 
 p2 :-
     read_binary(Bin),
     phrase(packet(Packet), Bin), !,
     value(Packet, V),
-    writeln(V).
+    write_answer(V).

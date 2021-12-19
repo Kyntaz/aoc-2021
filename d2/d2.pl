@@ -55,10 +55,10 @@ p1 :-
     read_commands(Commands),
     do_commands(Commands, (0,0), (Position, Depth)),
     N is Depth * Position,
-    writeln(N).
+    write_answer(N).
 
 p2 :-
     read_commands(Commands),
     do_commands2(Commands, (0,0,0), (Position, Depth, _)),
     N is Depth * Position,
-    writeln(N).
+    write_answer(N).

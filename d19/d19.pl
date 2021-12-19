@@ -164,7 +164,7 @@ p1 :-
     normalize_all(Scanners, _, Beacons),
     writeln("All Beacons"),
     length(Beacons, NBeacons),
-    writeln(NBeacons).
+    write_answer(NBeacons).
 
 p2 :-
     read_scanners(Scanners),
@@ -176,4 +176,4 @@ p2 :-
         member(P2, Positions),
         manhattan_dist(P1, P2, Dist)    
     ), MaxDist),
-    writeln(MaxDist).
+    write_answer(MaxDist).

@@ -72,9 +72,9 @@ good_velocity(Vx, Vy, XMin, XMax, YMin, YMax, H) :-
 p1 :-
     read_target_area(XMin, XMax, YMin, YMax),
     aggregate(max(H), (Vx, Vy, H)^good_velocity(Vx, Vy, XMin, XMax, YMin, YMax, H), MaxH),
-    writeln(MaxH).
+    write_answer(MaxH).
 
 p2 :-
     read_target_area(XMin, XMax, YMin, YMax),
     aggregate(count, (Vx, Vy, H)^good_velocity(Vx, Vy, XMin, XMax, YMin, YMax, H), N),
-    writeln(N).
+    write_answer(N).

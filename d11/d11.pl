@@ -111,9 +111,9 @@ synchronize(Matrix, Step, TotalSteps) :-
 p1 :-
     read_octopuses(Matrix),
     steps(100, Matrix, _, 0, TotalFlashes),
-    writeln(TotalFlashes).
+    write_answer(TotalFlashes).
 
 p2 :-
     read_octopuses(Matrix),
     synchronize(Matrix, 0, Steps),
-    writeln(Steps).
+    write_answer(Steps).

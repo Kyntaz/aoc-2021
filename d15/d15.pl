@@ -58,6 +58,7 @@ visit((Position, Cost)) :-
     assert_expanded(Position, Cost).
 
 visit(Matrix, (MaxX, MaxY), Current) :-
+    writeln(Current),
     findall(Neighbor, (
         neighbor_cost(Matrix, Current, Neighbor),
         Neighbor = ((X, Y), _),
@@ -69,9 +70,9 @@ visit(Matrix, (MaxX, MaxY), Current) :-
     ), Neighbors),
     maplist(visit, Neighbors).
 
-dijkstra(_, EndPosition, FinalCost) :-
+a_star(_, EndPosition, FinalCost) :-
     expanded(EndPosition, FinalCost), !.
-dijkstra(Matrix, EndPosition, FinalCost) :-
+a_star(Matrix, EndPosition, FinalCost) :-
     EndPosition = (MaxX, MaxY),
     aggregate_all(min(H, (P, C)), (
         expanded(P, C),
@@ -81,14 +82,14 @@ dijkstra(Matrix, EndPosition, FinalCost) :-
     assert_closed(Position),
     retract_expanded(Position, Cost),
     visit(Matrix, EndPosition, (Position, Cost)),
-    dijkstra(Matrix, EndPosition, FinalCost).
+    a_star(Matrix, EndPosition, FinalCost).
 
 p1 :-
     read_risk_matrix(RiskMatrix),
     end_position(RiskMatrix, EndPosition),
     assert_expanded((0,0), 0),
-    dijkstra(RiskMatrix, EndPosition, Cost),
-    writeln(Cost).
+    a_star(RiskMatrix, EndPosition, Cost),
+    write_answer(Cost).
 
 p2 :-
     read_risk_matrix(RiskMatrix),
@@ -96,5 +97,5 @@ p2 :-
     EndX is W * 5 - 1,
     EndY is H * 5 - 1,
     assert_expanded((0,0), 0),
-    dijkstra(RiskMatrix, (EndX, EndY), Cost),
-    writeln(Cost).
+    a_star(RiskMatrix, (EndX, EndY), Cost),
+    write_answer(Cost).

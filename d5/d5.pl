@@ -67,7 +67,7 @@ p1 :-
         gen_assoc(K, Map, N),
         N >= 2
     ), Overlaps),
-    writeln(Overlaps).
+    write_answer(Overlaps).
 
 p2 :-
     read_vents(Vents),
@@ -77,4 +77,4 @@ p2 :-
         gen_assoc(K, Map, N),
         N >= 2
     ), Overlaps),
-    writeln(Overlaps).
+    write_answer(Overlaps).

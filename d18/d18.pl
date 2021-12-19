@@ -109,9 +109,9 @@ p1 :-
     read_homework(Numbers),
     add_list(Numbers, Result),
     magnitude(Result, Magnitude),
-    writeln(Magnitude).
+    write_answer(Magnitude).
 
 p2 :-
     read_homework(Numbers),
     aggregate(max(Magnitude), add_2(Numbers, Magnitude), MaxMagnitude),
-    writeln(MaxMagnitude).
+    write_answer(MaxMagnitude).

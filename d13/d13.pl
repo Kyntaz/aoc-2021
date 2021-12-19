@@ -72,7 +72,7 @@ p1 :-
     fold_dots(Instruction, Dots, FoldedDots),
     sort(FoldedDots, UniqueDots),
     length(UniqueDots, NVisible),
-    writeln(NVisible).
+    write_answer(NVisible).
 
 p2 :-
     read_dots_instructions(Dots, Instructions),
@@ -80,4 +80,5 @@ p2 :-
     sort(FoldedDots, UniqueDots),
     initialize_grid(UniqueDots, Grid),
     dot_grid(FoldedDots, Grid, PrintedGrid),
+    write_answer("vvv"),
     write_grid(PrintedGrid). 

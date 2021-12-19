@@ -15,7 +15,9 @@
     char_number/2,
     rev_base_chars_number/3,
     base_chars_number/3,
-    base_string_number/3
+    base_string_number/3,
+    write_answer/1,
+    write_debug/1
 ]).
 
  
@@ -146,3 +148,15 @@ base_chars_number(Base, Chars, Number) :-
 base_string_number(Base, String, Number) :-
     string_chars(String, Chars),
     base_chars_number(Base, Chars, Number).
+
+%! answer(+Answer) is det
+% Prints the answer to stdout.
+write_answer(Answer) :-
+    write("[Answer]: "),
+    writeln(Answer).
+
+%! debug(+Object) is det
+% Prints something to the stdout as a debug line.
+write_debug(Object) :-
+    write("[Debug]: "),
+    writeq(Object), nl.

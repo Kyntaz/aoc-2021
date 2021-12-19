@@ -92,7 +92,7 @@ p1 :-
     concurrent_maplist(entry_to_nums, Entries, Nums),
     maplist(count_nums_in_entry([1, 4, 7, 8]), Nums, Counts),
     sum_list(Counts, Count),
-    writeln(Count).
+    write_answer(Count).
 
 p2 :-
     assert_all_permutations,
@@ -100,4 +100,4 @@ p2 :-
     concurrent_maplist(entry_to_nums, Entries, Digs),
     maplist(entry_to_num, Digs, Nums),
     sum_list(Nums, Sum),
-    writeln(Sum).
+    write_answer(Sum).

@@ -44,9 +44,9 @@ valid_path(Graph, Path, AllowDup) :-
 p1 :-
     read_connections(Graph),
     aggregate(count, Path^valid_path(Graph, Path, false), NPaths),
-    writeln(NPaths).
+    write_answer(NPaths).
 
 p2 :-
     read_connections(Graph),
     aggregate(count, Path^valid_path(Graph, Path, true), NPaths),
-    writeln(NPaths).
+    write_answer(NPaths).

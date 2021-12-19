@@ -74,7 +74,7 @@ p1 :-
     max_list(Counts, Max),
     min_list(Counts, Min),
     Result is Max - Min,
-    writeln(Result).
+    write_answer(Result).
 
 p2 :-
     read_polymerization(Template, InsertionRules),
@@ -87,4 +87,4 @@ p2 :-
     max_list(Counts, Max),
     min_list(Counts, Min),
     Result is Max - Min,
-    writeln(Result).
+    write_answer(Result).

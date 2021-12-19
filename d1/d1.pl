@@ -19,11 +19,11 @@ sum_window(Measurements, Sum) :-
 p1 :-
     read_measurements(Measurements),
     aggregate(count, (V1, V2)^increase(Measurements, V1, V2), Increments),
-    writeln(Increments).
+    write_answer(Increments).
 
 % We are taking advantage of the order in which append unifies a sub-list
 p2 :-
     read_measurements(Measurements),
     findall(Sum, sum_window(Measurements, Sum), Coarse),
     aggregate(count, (V1, V2)^increase(Coarse, V1, V2), Increments),
-    writeln(Increments).
+    write_answer(Increments).

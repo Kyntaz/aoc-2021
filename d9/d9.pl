@@ -55,7 +55,7 @@ p1 :-
     findall(Value, low_point(Heightmap, _, Value), Lowpoints),
     maplist(calc(+, 1), Lowpoints, RiskLevels),
     sum_list(RiskLevels, TotalRisk),
-    writeln(TotalRisk).
+    write_answer(TotalRisk).
 
 p2 :-
     read_heightmap(Heightmap),
@@ -65,4 +65,4 @@ p2 :-
     msort(BasinSizes, SortedSizes),
     append([_, [V1, V2, V3]], SortedSizes),
     V is V1 * V2 * V3,
-    writeln(V).
+    write_answer(V).

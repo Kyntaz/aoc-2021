@@ -60,7 +60,7 @@ p1 :-
     ), Errors),
     maplist(points, Errors, Points),
     sum_list(Points, Total),
-    writeln(Total).
+    write_answer(Total).
 
 p2 :- 
     read_code_lines(Lines),
@@ -73,4 +73,4 @@ p2 :-
     length(Scores, NScores),
     MiddleIdx is floor(NScores / 2),
     nth0(MiddleIdx, ScoresSrt, MiddleScore),
-    writeln(MiddleScore).
+    write_answer(MiddleScore).

@@ -67,7 +67,7 @@ p1 :-
     min_list(Times, MinTime),
     nth0(WinningIdx, Times, MinTime),
     nth0(WinningIdx, Scores, WinningScore),
-    writeln(WinningScore).
+    write_answer(WinningScore).
 
 p2 :-
     read_input(Numbers, Boards),
@@ -75,4 +75,4 @@ p2 :-
     max_list(Times, MaxTime),
     nth0(WinningIdx, Times, MaxTime),
     nth0(WinningIdx, Scores, WinningScore),
-    writeln(WinningScore).
+    write_answer(WinningScore).

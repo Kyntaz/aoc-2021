@@ -31,10 +31,10 @@ p1 :-
     read_lanternfish(Lanternfish),
     reproduce_for_days(80, Lanternfish, NewLanternfish),
     sum_list(NewLanternfish, NLanternfish),
-    writeln(NLanternfish).
+    write_answer(NLanternfish).
 
 p2 :-
     read_lanternfish(Lanternfish),
     reproduce_for_days(256, Lanternfish, NewLanternfish),
     sum_list(NewLanternfish, NLanternfish),
-    writeln(NLanternfish).
+    write_answer(NLanternfish).

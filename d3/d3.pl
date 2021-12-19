@@ -37,7 +37,7 @@ p1 :-
     maplist([X,Y]>>((X='0',Y='1') ; (X='1',Y='0')), CommonBits, UncommonBits),
     base_chars_number(2, UncommonBits, Epsilon),
     Power is Gamma * Epsilon,
-    writeln(Power).
+    write_answer(Power).
 
 p2 :-
     read_grid(Bits),
@@ -46,4 +46,4 @@ p2 :-
     base_chars_number(2, OxigenBits, Oxigen),
     base_chars_number(2, ScrubberBits, Scrubber),
     Life is Oxigen * Scrubber,
-    writeln(Life).
+    write_answer(Life).
