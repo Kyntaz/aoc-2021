@@ -1,4 +1,5 @@
 :- use_module("common/util.pl").
+:- encoding(utf8).
 
 %! read_dot(+Line, -Dot)
 read_dot(Line, (X, Y)) :-
@@ -38,7 +39,7 @@ do_instructions([Instruction | Instructions], Dots, NewDots) :-
 dot_grid([], Grid, Grid).
 dot_grid([(X, Y) | Dots], Grid, NewGrid) :-
     nth0(Y, Grid, Line),
-    replace(X, '#', Line, NewLine),
+    replace(X, '█', Line, NewLine),
     replace(Y, NewLine, Grid, TempGrid),
     dot_grid(Dots, TempGrid, NewGrid).
 
@@ -56,8 +57,7 @@ initialize_grid(Dots, Grid) :-
 
 %! write_gridpoint(+Char)
 write_gridpoint(Char) :-
-    write(Char),
-    write(' ').
+    write(Char), write(Char).
 
 %! write_gridline(+Line)
 write_gridline(Line) :-

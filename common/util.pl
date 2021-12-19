@@ -19,7 +19,10 @@
     write_answer/1,
     write_debug/1
 ]).
-
+:- encoding(utf8).
+:- set_prolog_flag(color_term, true).
+:- set_stream(current_output, tty(true)).
+:- set_stream(current_output, encoding(utf8)).
  
 %! read_lines(-Lines:list[string]) is semidet
 % Reads lines from the stdin as a list of strings.
@@ -152,11 +155,10 @@ base_string_number(Base, String, Number) :-
 %! answer(+Answer) is det
 % Prints the answer to stdout.
 write_answer(Answer) :-
-    write("[Answer]: "),
-    writeln(Answer).
+    ansi_format([bold, fg8(green)], "[Answer]: ~w", [Answer]), nl.
 
 %! debug(+Object) is det
 % Prints something to the stdout as a debug line.
 write_debug(Object) :-
-    write("[Debug]: "),
-    writeq(Object), nl.
+    ansi_format(fg8(yellow), "[Debug]: ~W", [Object]), nl.
+
