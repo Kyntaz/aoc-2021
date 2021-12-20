@@ -17,7 +17,8 @@
     base_chars_number/3,
     base_string_number/3,
     write_answer/1,
-    write_debug/1
+    write_debug/1,
+    write_debug/2
 ]).
 :- encoding(utf8).
 :- set_prolog_flag(color_term, true).
@@ -162,3 +163,7 @@ write_answer(Answer) :-
 write_debug(Object) :-
     ansi_format(fg8(yellow), "[Debug]: ~W", [Object, []]), nl.
 
+%! debug(+Message, +Object) is det
+% Prints something to the stdout as a debug line.
+write_debug(Message, Object) :-
+    ansi_format(fg8(yellow), "[~w]: ~W", [Message, Object, []]), nl.
