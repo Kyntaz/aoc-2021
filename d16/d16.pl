@@ -1,3 +1,4 @@
+:- module(d16, []).
 :- use_module("common/util.pl").
 
 %! hex_bin(?Hex, ?Bin)

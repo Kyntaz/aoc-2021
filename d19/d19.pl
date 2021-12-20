@@ -1,3 +1,4 @@
+:- module(d19, []).
 :- use_module("common/util.pl").
 
 read_position(Line, p(X, Y, Z)) :-

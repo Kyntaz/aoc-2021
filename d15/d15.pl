@@ -1,3 +1,4 @@
+:- module(d15, []).
 :- use_module("common/util").
 :- dynamic d_expanded/3.
 :- dynamic d_closed/2.

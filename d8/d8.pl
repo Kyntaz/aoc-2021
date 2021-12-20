@@ -1,3 +1,4 @@
+:- module(d8, []).
 :- use_module("common/util.pl").
 :- dynamic segment_display/2.
 

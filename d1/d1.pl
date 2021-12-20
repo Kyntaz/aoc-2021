@@ -1,3 +1,4 @@
+:- module(d1, []).
 :- use_module("common/util.pl").
 
 %! read_measurements(-Measurements:list[number])

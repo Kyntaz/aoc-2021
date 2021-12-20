@@ -1,3 +1,4 @@
+:- module(d14, []).
 :- use_module("common/util.pl").
 
 %! read_template(+Line, -Template:Element[])

@@ -1,3 +1,4 @@
+:- module(d20, []).
 :- use_module("common/util.pl").
 
 to_binary('.', '0').

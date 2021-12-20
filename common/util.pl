@@ -167,3 +167,10 @@ write_debug(Object) :-
 % Prints something to the stdout as a debug line.
 write_debug(Message, Object) :-
     ansi_format(fg8(yellow), "[~w]: ~W", [Message, Object, []]), nl.
+
+%! useful_traces
+% Useful tracing settings for debug purposes.
+useful_traces(Module) :-
+    write_debug("Starting traces"),
+    leash(-all),
+    trace(Module:_).

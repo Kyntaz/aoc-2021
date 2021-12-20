@@ -1,3 +1,4 @@
+:- module(d5, []).
 :- use_module("common/util.pl").
 
 %! string_to_number_pair(+Str, -Pair)

@@ -1,3 +1,4 @@
+:- module(d9, []).
 :- use_module("common/util.pl").
 
 %! read_heightmap(-Heightmap)

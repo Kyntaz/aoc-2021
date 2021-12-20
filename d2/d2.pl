@@ -1,3 +1,4 @@
+:- module(d2, []).
 :- use_module("common/util.pl").
  
 %! line_to_command(+Line:string, -Command:(string, number))

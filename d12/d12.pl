@@ -1,3 +1,4 @@
+:- module(d12, []).
 :- use_module("common/util.pl").
 
 %! read_connection(+Line, -Connection)

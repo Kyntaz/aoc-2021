@@ -1,3 +1,4 @@
+:- module(d7, []).
 :- use_module("common/util.pl").
 
 %! read_crabs(-Crabs)

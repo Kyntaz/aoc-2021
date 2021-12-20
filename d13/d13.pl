@@ -1,3 +1,4 @@
+:- module(d13, []).
 :- use_module("common/util.pl").
 :- encoding(utf8).
 

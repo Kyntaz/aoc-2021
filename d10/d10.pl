@@ -1,3 +1,4 @@
+:- module(d10, []).
 :- use_module("common/util.pl").
 
 %! read_code_lines(-Lines)

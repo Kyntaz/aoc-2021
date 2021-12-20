@@ -1,3 +1,4 @@
+:- module(d4, []).
 :- use_module("common/util.pl").
 :- use_module(library(clpfd)).
 

@@ -1,3 +1,4 @@
+:- module(d11, []).
 :- use_module("common/util.pl").
 
 %! read_octopuses(-OctopusMatrix)

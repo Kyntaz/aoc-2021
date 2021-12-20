@@ -1,3 +1,4 @@
+:- module(d6, []).
 :- use_module("common/util.pl").
 
 %! count(+List, -Count)

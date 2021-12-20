@@ -1,3 +1,4 @@
+:- module(d18, []).
 :- use_module("common/util.pl").
 :- use_module(library(dcg/basics)).
 
