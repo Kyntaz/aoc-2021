@@ -18,6 +18,12 @@ So for the fourth day, second part the command would be:
 ./run.ps1 d4 p2
 ```
 
+You can also run a day while printing relevant trace information with the command:
+
+```
+./debug.ps1 <day> <part>
+```
+
 ## 📁 Structure
 
 The project has one folder, `./dX`, for each day.
