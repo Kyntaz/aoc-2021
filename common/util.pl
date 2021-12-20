@@ -160,5 +160,5 @@ write_answer(Answer) :-
 %! debug(+Object) is det
 % Prints something to the stdout as a debug line.
 write_debug(Object) :-
-    ansi_format(fg8(yellow), "[Debug]: ~W", [Object]), nl.
+    ansi_format(fg8(yellow), "[Debug]: ~W", [Object, []]), nl.
 
