@@ -68,14 +68,12 @@ enhance_image(Table, i(Bg, Pixels), i(NewBg, NewPixels)) :-
 
 repeat_enhance(_, 0, Image, Image) :- !.
 repeat_enhance(Table, N, Image0, Image) :-
-    write_debug("Enhancings Left", N),
     N1 is N - 1,
     enhance_image(Table, Image0, Image1),
     repeat_enhance(Table, N1, Image1, Image).
 
 p1 :-
     read_input(Image, Table),
-    write_debug("Table", Table),
     repeat_enhance(Table, 2, Image, Image1),
     Image1 = i('0', Pixels),
     length(Pixels, LitPixels),
@@ -83,7 +81,6 @@ p1 :-
 
 p2 :-
     read_input(Image, Table),
-    write_debug("Table", Table),
     repeat_enhance(Table, 50, Image, Image1),
     Image1 = i('0', Pixels),
     length(Pixels, LitPixels),

@@ -58,7 +58,6 @@ visit((Position, Cost)) :-
     assert_expanded(Position, Cost).
 
 visit(Matrix, (MaxX, MaxY), Current) :-
-    write_debug(Current),
     findall(Neighbor, (
         neighbor_cost(Matrix, Current, Neighbor),
         Neighbor = ((X, Y), _),
