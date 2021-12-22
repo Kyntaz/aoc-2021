@@ -1,16 +1,20 @@
 :- module(d20, []).
 :- use_module("common/util.pl").
 
+%! to_binary(?Char, ?Binary)
 to_binary('.', '0').
 to_binary('#', '1').
 
+%! rev(?Bit1, ?Bit2)
 rev('0', '1').
 rev('1', '0').
 
+%! read_binary_line(+Line, -Table)
 read_binary_line(Line, Table) :-
     string_chars(Line, TableChars),
     maplist(to_binary, TableChars, Table).
 
+%! read_image(+Block, -Image)
 read_image(Block, Image) :-
     maplist(read_binary_line, Block, BinBlock),
     setof(Point, (X, Y, Line, Point)^(
@@ -19,16 +23,21 @@ read_image(Block, Image) :-
         Point = p(Y, X)
     ), Image).
 
+%! read_input(-Image, -Table)
+% An image is a background char followed by a list of
+% background points.
 read_input(i('0', Image), Table) :-
     read_blocks([[TableStr], ImageBlock]),
     read_binary_line(TableStr, Table),
     read_image(ImageBlock, Image).
 
+%! read_pixel(+Image, +Point, -Pixel)
 read_pixel(i(Bg, Pixels), Point, Fg) :-
     ord_memberchk(Point, Pixels), !,
     rev(Bg, Fg).
 read_pixel(i(Bg, _), _, Bg).
 
+%! region_of_interest(+Image, -BottomRight, -TopLeft)
 region_of_interest(i(_, Image), p(MinY1, MinX1), p(MaxY1, MaxX1)) :-
     aggregate(r(min(X), max(X), min(Y), max(Y)), (X, Y)^(
         member(p(Y,X), Image)
@@ -38,6 +47,7 @@ region_of_interest(i(_, Image), p(MinY1, MinX1), p(MaxY1, MaxX1)) :-
     MinX1 is MinX - 3,
     MinY1 is MinY - 3.
 
+%! read_window(+Image, +Table, +Center, -NewPixel)
 read_window(i(Bg, Image), Table, p(CY, CX), Out) :-
     MaxX is CX + 1,
     MaxY is CY + 1,
@@ -54,6 +64,7 @@ read_window(i(Bg, Image), Table, p(CY, CX), Out) :-
     base_chars_number(2, Binary, Decimal),
     nth0(Decimal, Table, Out).
 
+%! enhance_image(+Table, +Image0, -Image)
 enhance_image(Table, i(Bg, Pixels), i(NewBg, NewPixels)) :-
     region_of_interest(i(Bg, Pixels), p(MinY, MinX), p(MaxY, MaxX)),
     numlist(MinX, MaxX, DomX),
@@ -67,6 +78,7 @@ enhance_image(Table, i(Bg, Pixels), i(NewBg, NewPixels)) :-
         read_window(i(Bg, Pixels), Table, Point, NewFg)
     ), NewPixels).
 
+% repeat_enhance(+Table, +Repeats, +Image, -EnhancedImage)
 repeat_enhance(_, 0, Image, Image) :- !.
 repeat_enhance(Table, N, Image0, Image) :-
     N1 is N - 1,

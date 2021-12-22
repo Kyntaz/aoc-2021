@@ -3,17 +3,22 @@
 :- use_module(library(dcg/basics)).
 :- dynamic cached_state/3.
 
+%! player_pos(-PlayerId, -Position)//
 player_pos(I, X) --> "Player ", integer(I), " starting position: ", integer(X).
 
+%! read_player_info(+Line, -PlayerState)
+% PlayerState has the player Id, Position, and current score.
 read_player_info(Line, player(I, X, 0)) :-
     string_codes(Line, Codes),
     phrase(player_pos(I, X), Codes).
 
+%! read_players(-Player1, -Player2)
 read_players(Player1, Player2) :-
     read_non_empty_lines([Line1, Line2]),
     read_player_info(Line1, Player1),
     read_player_info(Line2, Player2).
 
+%! turn(+Dice0, -Dice, +PlayerState0, -PlayerState)
 turn(D0, D, player(I, X0, S0), player(I, X, S)) :-
     X1 is X0 + 3*D0 + 3,
     X is ((X1 - 1) mod 10) + 1,
@@ -21,11 +26,15 @@ turn(D0, D, player(I, X0, S0), player(I, X, S)) :-
     D1 is D0 + 3,
     D is ((D1 - 1) mod 100) + 1.
 
+%! turn_pair(+Dice0, -Dice, +Player0, -Player, +Cpu0, -Cpu)
+% Does a turn for the player, and if the player didn't win, a turn for the Cpu.
 turn_pair(D0, D, Player0, Cpu0, Player, Cpu) :-
     turn(D0, D1, Player0, Player),
     Player = player(_,_,S),
     (S < 1000 -> turn(D1, D, Cpu0, Cpu) ; Cpu = Cpu0).
 
+%! until_win(++0, -FinalDiceTurns, +Dice, +Player, +Cpu, -FinalPlayer, -FinalCpu)
+% Plays the game until someone wins.
 until_win(Turns, FinalTurns, _, Player, Cpu, Player, Cpu) :-
     Player = player(_, _, S),
     S >= 1000, !,
@@ -39,15 +48,22 @@ until_win(Turns, FinalTurns, Dice, Player, Cpu, FinalPlayer, FinalCpu) :-
     Turns1 is Turns + 6,
     until_win(Turns1, FinalTurns, Dice1, Player1, Cpu1, FinalPlayer, FinalCpu).
 
+%! losing_score(+Player, +Cpu, -LosingScore)
 losing_score(player(_,_,S1), player(_,_,S2), Score) :-
     (S1 >= 1000 -> Score = S2 ; Score = S1).
 
+%! cache_state(+GameState, +Wins1, +Wins2)
+% Caches a game state, saying that if we play a quantum game
+% from this state, player 1 wins in Wins1 universes and player
+% 2 in Wins2.
 cache_state(State, Wins1, Wins2) :-
-    cached_state(State, Wins1, Wins2), !,
-    write_debug("Repeated cache").
+    cached_state(State, Wins1, Wins2), !.
 cache_state(State, Wins1, Wins2) :-
     assertz(cached_state(State, Wins1, Wins2)).
 
+%! qturn(+State0, -State)
+% Takes a starting state and unifies State with all possible next
+% states for a quantum match on backtracking.
 qturn(s(1, player(1, X0, S0), Player2), s(2, player(1, X, S), Player2)) :-
     Possibilities = [1, 2, 3],
     member(D1, Possibilities),
@@ -65,11 +81,16 @@ qturn(s(2, Player1, player(2, X0, S0)), s(1, Player1, player(2, X, S))) :-
     X is ((X1 - 1) mod 10) + 1,
     S is S0 + X.
 
+%! winning_state(-WinnerId, +State)
 winning_state(1, s(_, player(_,_,S), _)) :-
     S >= 21.
 winning_state(2, s(_, _, player(_,_,S))) :-
     S >= 21.
 
+%! possible_outcomes(+State, -Wins1, Wins2)
+% Affirms that if a quantum game is played from this point,
+% player 1 wins in Wins1 universes and player 2 in Wins 2.
+% Uses cached states to avoid expanding already explored states.
 possible_outcomes(State, Wins1, Wins2) :-
     cached_state(State, Wins1, Wins2), !.
 possible_outcomes(State, 1, 0) :-

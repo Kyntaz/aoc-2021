@@ -1,36 +1,46 @@
 :- module(d19, []).
 :- use_module("common/util.pl").
 
+%! read_position(+Line, -Position)
 read_position(Line, p(X, Y, Z)) :-
     split_string(Line, ",", "", [XStr, YStr, ZStr]),
     number_string(X, XStr),
     number_string(Y, YStr),
     number_string(Z, ZStr).
 
+%! read_scanner(+Block, -Scanner)
+% Each scanner is the name of the scanner it is relative to (initially itself)
+% and the positions of the beacons it sees.
 read_scanner([NameStr | Lines], scanner(Name, Beacons)) :-
     split_string(NameStr, " ", " ", ["---", "scanner", NameWord, "---"]),
     number_string(Name, NameWord),
     maplist(read_position, Lines, Beacons0),
     sort(Beacons0, Beacons).
 
+%! read_scanners(-Scanners)
 read_scanners(Scanners) :-
     read_blocks(ScannerBlocks),
     maplist(read_scanner, ScannerBlocks, Scanners).
 
+%! side(?Side)
 side(+).
 side(-).
 
+%! dir(?Direction)
 dir(x).
 dir(y).
 dir(z).
 
+%! axis(?Axis)
 axis(ax(Side, Dir)) :-
     side(Side),
     dir(Dir).
 
+%! neg_ax(?Axis, ?NegativeAxis)
 neg_ax(ax(+,Side), ax(-,Side)).
 neg_ax(ax(-,Side), ax(+,Side)).
 
+%! perpendicular(+Axis1, +Axis2, -PerpenticularAxis)
 :- table perpendicular/3.
 perpendicular(ax(+,x), ax(+,y), ax(+,z)) :- !.
 perpendicular(ax(+,y), ax(+,z), ax(+,x)) :- !.
@@ -51,6 +61,8 @@ perpendicular(Ax1, Ax2, Ax3) :-
     neg_ax(Ax2, NAx2),
     perpendicular(NAx1, NAx2, Ax3), !.
 
+%! orientation(?Orientation)
+% An up and a facing axis.
 orientation(o(Facing, Up)) :-
     axis(Facing),
     axis(Up),
@@ -59,6 +71,7 @@ orientation(o(Facing, Up)) :-
         Up = ax(_, Dir)
     ).
 
+%! oriented(+Orientation, +Point, -RotatedPoint)
 oriented(o(Facing, Up), p(X0, Y0, Z0), p(X, Y, Z)) :-
     Facing = ax(Side, Dir),
     (Dir = x -> X1 is X0 ; true),
@@ -79,33 +92,41 @@ oriented(o(Facing, Up), p(X0, Y0, Z0), p(X, Y, Z)) :-
     (Side2 = + -> Z is Z1 ; true),
     (Side2 = - -> Z is -Z1 ; true), !.
 
+%! oriented(+Orientation, +Scanner, -RotatedScanner)
 oriented(Orientation, scanner(S, Beacons0), scanner(S, Beacons)) :-
     maplist(oriented(Orientation), Beacons0, Beacons1),
     sort(Beacons1, Beacons).
 
+%! translated(+Vector, +Point, -TranslatedPoint)
 translated(v(Vx, Vy, Vz), p(X0, Y0, Z0), p(X, Y, Z)) :-
     X is X0 + Vx,
     Y is Y0 + Vy,
     Z is Z0 + Vz.
 
+%! translated(+Vector, +Scanner, -TranslatedScanner)
 translated(Vect, scanner(S, Beacons0), scanner(S, Beacons)) :-
     maplist(translated(Vect), Beacons0, Beacons).
 
+%! to(-Vection, +From, +To)
 to(v(Vx, Vy, Vz), p(X1, Y1, Z1), p(X2, Y2, Z2)) :-
     Vx is X2 - X1,
     Vy is Y2 - Y1,
     Vz is Z2 - Z1.
 
+%! inverse_v(+Vector, -InverseVector)
 inverse_v(v(Vx,Vy,Vz), v(NVx,NVy,NVz)) :-
     NVx is -Vx,
     NVy is -Vy,
     NVz is -Vz.
 
+%! add_v(+Point, +Vector, -TranslatedPoint)
 add_v(p(X0,Y0,Z0), v(Vx,Vy,Vz), p(X,Y,Z)) :-
     X is X0 + Vx,
     Y is Y0 + Vy,
     Z is Z0 + Vz.
 
+%! align(+Scanner1, +Scanner2, -Transformation)
+% Transformation applied to Scanner1 aligns it with Scanner2.
 align(scanner(S1, Beacons1), scanner(S2, Beacons2), t((S1, S2), O, V)) :-
     orientation(O),
     oriented(O, scanner(S1, Beacons1), scanner(S1, Beacons3)),
@@ -117,17 +138,22 @@ align(scanner(S1, Beacons1), scanner(S2, Beacons2), t((S1, S2), O, V)) :-
     length(IBeacons, Count),
     Count >= 12, !.
 
+%! scannner_align(+Scanners, +Scanner, -Transform)
+% Transforms aligns Scanner with one of Scanners.
 scanner_align(Scanners, Scanner, Transform) :-
     member(Scanner1, Scanners),
     Scanner1 \= Scanner,
     align(Scanner, Scanner1, Transform).
 
+%! alignements(+Scannrs, -Transforms)
 alignements(Scanners, Transforms) :-
     findall(Transform, (
         member(Scanner, Scanners),
         scanner_align(Scanners, Scanner, Transform)
     ), Transforms).
 
+%! normalize(+Transforms, +PreviousTransformations, +RelativeScannerPosition,
+%!  +Scanner0, -Scanner, -ScannerPosition)
 normalize(_, _, _, scanner(0, Beacons), scanner(0, Beacons), p(0,0,0)) :- !.
 normalize(Transforms, _, TempPosition, scanner(S0, Beacons0), scanner(0, Beacons), NPosition) :-
     member(t((S0, 0), O, V), Transforms), !,
@@ -146,6 +172,9 @@ normalize(Transforms, Previous, TempPosition, scanner(S0, Beacons0), scanner(S, 
     add_v(TempPosition1, NV, TempPosition2),
     normalize(Transforms, [(S0, S1) | Previous], TempPosition2, scanner(S1, Beacons2), scanner(S, Beacons), NPosition).
 
+%! normalize_all(+Scanners, -Positions, -Beacons)
+% Align all scanners, calculating the position of all scanners and beacons
+% relative to scanner 0.
 normalize_all(Scanners, Positions, Beacons) :-
     alignements(Scanners, Transforms),
     maplist(normalize(Transforms, [], p(0,0,0)), Scanners, NormalizedScanners, Positions),
@@ -154,6 +183,7 @@ normalize_all(Scanners, Positions, Beacons) :-
         member(Beacon, Beacons1)
     ), Beacons), !.
 
+%! manhattan_dist(+Point1, +Point2, -Distance)
 manhattan_dist(p(X1,Y1,Z1), p(X2,Y2,Z2), Dist) :-
     Dist is abs(X1-X2) + abs(Y1-Y2) + abs(Z1-Z2).
 
