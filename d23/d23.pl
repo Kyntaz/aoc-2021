@@ -1,188 +1,205 @@
 :- module(d23, []).
 :- use_module("common/util.pl").
-:- dynamic cheapest_organize_cache/2.
+:- dynamic cost_cache/2.
+:- dynamic depth_levels/1.
+:- dynamic visited/2.
+:- dynamic closed/1.
 
-read_input(s([A1, A2], [B1, B2], [C1, C2], [D1, D2], Hallway)) :-
-    read_non_empty_lines([_, _, Line1, Line2, _]),
-    split_string(Line1, "#", "#", [A1, B1, C1, D1]),
-    split_string(Line2, "#", "#", [_, A2, B2, C2, D2]),
-    length(Hallway, 7),
-    maplist(=(empty), Hallway).
+position(pos(Kind, Level)) :-
+    member(Kind, [a,b,c,d]),
+    depth_levels(Depths),
+    member(Level, Depths).
+position(pos(h, Level)) :-
+    member(Level, [1,2,3,4,5,6,7,8,9,10,11]).
 
-cost("A", 1).
-cost("B", 10).
-cost("C", 100).
-cost("D", 1000).
+:- table connected/2.
+connected(pos(a, 2), pos(a, 1)).
+connected(pos(a, 3), pos(a, 2)).
+connected(pos(a, 4), pos(a, 3)).
+connected(pos(b, 2), pos(b, 1)).
+connected(pos(b, 3), pos(b, 2)).
+connected(pos(b, 4), pos(b, 3)).
+connected(pos(c, 2), pos(c, 1)).
+connected(pos(c, 3), pos(c, 2)).
+connected(pos(c, 4), pos(c, 3)).
+connected(pos(d, 2), pos(d, 1)).
+connected(pos(d, 3), pos(d, 2)).
+connected(pos(d, 4), pos(d, 3)).
+connected(pos(h, 1), pos(h, 2)).
+connected(pos(h, 2), pos(h, 3)).
+connected(pos(h, 3), pos(h, 4)).
+connected(pos(h, 4), pos(h, 5)).
+connected(pos(h, 5), pos(h, 6)).
+connected(pos(h, 6), pos(h, 7)).
+connected(pos(h, 7), pos(h, 8)).
+connected(pos(h, 8), pos(h, 9)).
+connected(pos(h, 9), pos(h, 10)).
+connected(pos(h, 10), pos(h, 11)).
+connected(pos(a, 1), pos(h, 3)).
+connected(pos(b, 1), pos(h, 5)).
+connected(pos(c, 1), pos(h, 7)).
+connected(pos(d, 1), pos(h, 9)).
+connected(Pos1, Pos2) :- connected(Pos2, Pos1).
 
-canonical_state(s([a1,a2],[b1,b2],[c1,c2],[d1,d2],[h1,h2,h3,h4,h5,h6,h7])).
+stable(_, shrimp(_, Pos)) :-
+    StablePositions = [
+        pos(h, 1), pos(h, 2), pos(h, 4), pos(h, 6),
+        pos(h, 8), pos(h, 10), pos(h, 11)
+    ],
+    member(Pos, StablePositions).
+stable(Shrimps, Shrimp) :- done(Shrimps, Shrimp).
 
-pos_id(a1, 1).
-pos_id(a2, 2).
-pos_id(b1, 3).
-pos_id(b2, 4).
-pos_id(c1, 5).
-pos_id(c2, 6).
-pos_id(d1, 7).
-pos_id(d2, 8).
-pos_id(h1, 9).
-pos_id(h2, 10).
-pos_id(h3, 11).
-pos_id(h4, 12).
-pos_id(h5, 13).
-pos_id(h6, 14).
-pos_id(h7, 15).
+done(Shrimps, shrimp(Kind, pos(Kind, Level))) :-
+    forall((
+        position(pos(Kind, Level2)),
+        Level2 > Level
+    ), member(shrimp(Kind, pos(Kind, Level2)), Shrimps)).
 
-corresponding_var(Vars, Pos, Var) :-
-    pos_id(Pos, Id),
-    nth1(Id, Vars, Var).
+free(Shrimps, Pos) :-
+    \+ member(shrimp(_, Pos), Shrimps).
 
-list_state(List, State) :-
-    StateBody = [[_,_],[_,_],[_,_],[_,_],[_,_,_,_,_,_,_]],
-    State =.. [s | StateBody],
-    flatten(StateBody, List).
-
-:- table to/3.
-to(a1, h2, 2).
-to(a1, h3, 2).
-to(a2, a1, 1).
-to(b1, h3, 2).
-to(b1, h4, 2).
-to(b2, b1, 1).
-to(c1, h4, 2).
-to(c1, h5, 2).
-to(c2, c1, 1).
-to(d1, h5, 2).
-to(d1, h6, 2).
-to(d2, d1, 1).
-to(h1, h2, 1).
-to(h2, h3, 2).
-to(h3, h4, 2).
-to(h4, h5, 2).
-to(h5, h6, 2).
-to(h6, h7, 1).
-to(Pos1, Pos2, Cost) :- to(Pos2, Pos1, Cost).
-
-room1(Pos) :- member(Pos, [a1, b1, c1, d1]).
-
-room2(Pos) :- member(Pos, [a2, b2, c2, d2]).
-
-hallway(Pos) :- member(Pos, [h1, h2, h3, h4, h5, h6, h7]).
-
-:- table same_room/2.
-same_room(a1, a2).
-same_room(b1, b2).
-same_room(c1, c2).
-same_room(d1, d2).
-same_room(R1, R2) :- same_room(R2, R1).
-
-expected(a1, "A").
-expected(a2, "A").
-expected(b1, "B").
-expected(b2, "B").
-expected(c1, "C").
-expected(c2, "C").
-expected(d1, "D").
-expected(d2, "D").
-
-
-replace_state(State0, Pos1, Pos2, State1) :-
-    list_state(List0, State0),
-    canonical_state(Canon),
-    list_state(CList, Canon),
-    nth0(I1, CList, Pos1),
-    nth0(I2, CList, Pos2),
-    nth0(I1, List0, El1),
-    nth0(I2, List0, El2),
-    replace(I1, El2, List0, List1),
-    replace(I2, El1, List1, List2),
-    list_state(List2, State1).
-
-state_pos(State, Pos, El) :-
-    canonical_state(CState),
-    list_state(CList, CState),
-    list_state(List, State),
-    nth0(I, CList, Pos),
-    nth0(I, List, El).
-
-possible_move(State0, State1, Pos1, Pos2, Cost, _) :-
-    to(Pos1, Pos2, Cost),
-    \+ state_pos(State0, Pos1, empty),
-    state_pos(State0, Pos2, empty),
-    replace_state(State0, Pos1, Pos2, State1), !.
-possible_move(State0, State1, Pos1, Pos2, Cost, Between) :-
-    to(Pos1, Pos3, PCost1),
-    \+ member(Pos3, Between),
-    \+ state_pos(State0, Pos1, empty),
-    state_pos(State0, Pos3, empty),
-    replace_state(State0, Pos1, Pos3, State2),
-    possible_move(State2, State1, Pos3, Pos2, PCost2, [Pos3 | Between]),
-    Cost is PCost1 + PCost2.
-
-cheapest_move(State0, State1, Pos0, Pos1, MinCost) :-
-    aggregate(min(Cost), (Cost)^possible_move(State0, State1, Pos0, Pos1, Cost, [Pos0]), MinCost).
-
-valid_move(State0, State1, Cost) :-
-    room1(Pos0),
-    hallway(Pos1),
-    state_pos(State0, Pos0, El),
-    \+ (
-        expected(Pos0, El),
-        same_room(Pos0, OtherPos),
-        state_pos(State0, OtherPos, El)
-    ),
-    cheapest_move(State0, State1, Pos0, Pos1, PCost),
-    cost(El, Mult),
-    Cost is PCost * Mult.
-valid_move(State0, State1, Cost) :-
-    room2(Pos0),
-    hallway(Pos1),
-    state_pos(State0, Pos0, El),
-    \+ expected(Pos0, El),
-    cheapest_move(State0, State1, Pos0, Pos1, PCost),
-    cost(El, Mult),
-    Cost is PCost * Mult.
-valid_move(State0, State1, Cost) :-
-    hallway(Pos0),
-    room2(Pos1),
-    state_pos(State0, Pos0, El),
-    expected(Pos1, El),
-    cheapest_move(State0, State1, Pos0, Pos1, PCost),
-    cost(El, Mult),
-    Cost is PCost * Mult.
-valid_move(State0, State1, Cost) :-
-    hallway(Pos0),
-    room1(Pos1),
-    state_pos(State0, Pos0, El),
-    expected(Pos1, El),
-    same_room(Pos1, OtherPos),
-    state_pos(State1, OtherPos, El),
-    cheapest_move(State0, State1, Pos0, Pos1, PCost),
-    cost(El, Mult),
-    Cost is PCost * Mult.
-
-organized(State) :-
-    forall(expected(Pos, Expected), state_pos(State, Pos, Expected)).
-
-add_inf(N1, N2, inf) :-
-    (N1 =:= inf ; N2 =:= inf), !.
-add_inf(N1, N2, Add) :- Add is N1 + N2.
-
-cheapest_organize(State, MinCost) :-
-    cheapest_organize_cache(State, MinCost), !.
-cheapest_organize(State, 0) :-
-    organized(State), !.
-cheapest_organize(State, MinCost) :-
-    findall((State1, Cost), (
-        valid_move(State, State1, Cost)
+:- table distance/4.
+distance(_, _, Pos, Pos, 0) :- !.
+distance(Shrimps, Visited, Pos2, Pos1, Dist) :-
+    findall(NextPos, (
+        connected(Pos1, NextPos),
+        free(Shrimps, NextPos),
+        \+ member(NextPos, Visited)
     ), Possibilities),
-    maplist([(NewState, NewCost), NewState, NewCost]>>(true), Possibilities, PossibleStates, PossibleCosts),
-    maplist(cheapest_organize, PossibleStates, FutureCosts),
-    maplist(add_inf, FutureCosts, PossibleCosts, TotalCosts),
-    (min_list(TotalCosts, MinCost) ; MinCost = inf),
-    write_debug(MinCost),
-    assertz(cheapest_organize_cache(State, MinCost)), !.
+    (Possibilities = [] -> Dist = inf ; 
+        maplist(distance(Shrimps, [Pos1 | Visited], Pos2), Possibilities, Distances),
+        min_list(Distances, PartialDistance),
+        (PartialDistance =:= inf -> Dist = inf ; Dist is PartialDistance + 1)
+    ).
+
+cost(a, 1).
+cost(b, 10).
+cost(c, 100).
+cost(d, 1000).
+
+move(Shrimps, shrimp(Kind, Pos1), shrimp(Kind, Pos2), Cost) :-
+    position(Pos1),
+    position(Pos2),
+    (Pos1 \= pos(h, _) ; Pos2 \= pos(h, _)),
+    \+ done(Shrimps, shrimp(Kind, Pos1)),
+    stable(Shrimps, shrimp(Kind, Pos2)),
+    distance(Shrimps, [], Pos2, Pos1, Dist),
+    Dist =\= inf,
+    cost(Kind, BaseCost),
+    Cost is BaseCost * Dist.
+
+all_done(Shrimps) :-
+    forall(member(Shrimp, Shrimps), done(Shrimps, Shrimp)).
+
+move_something(Shrimps1, Shrimps2, Cost) :-
+    member(Shrimp1, Shrimps1),
+    move(Shrimps1, Shrimp1, Shrimp2, Cost),
+    select(Shrimp1, Shrimps1, Shrimp2, Shrimps2),
+    Shrimps1 \= Shrimps2.
+
+cost_cached(Shrimps, Cost) :- cost_cache(Shrimps, Cost).
+
+cache_cost(Shrimps, Cost) :- assertz(cost_cache(Shrimps, Cost)).
+
+organize(_, Shrimps, Cost) :- cost_cached(Shrimps, Cost), !.
+organize(_, Shrimps, 0) :- all_done(Shrimps), !.
+organize(Visited, Shrimps, Cost) :-
+    setof(next(CostTo, NextShrimps), (CostTo, NextShrimps)^(
+        move_something(Shrimps, NextShrimps, CostTo),
+        \+ member(NextShrimps, Visited)
+    ), Possibilities),
+    maplist({Visited}/[next(CostTo, NextShrimps), TotalCost]>>(
+        organize([Shrimps | Visited], NextShrimps, CostFrom),
+        (CostFrom =:= inf -> TotalCost = inf ; TotalCost is CostFrom + CostTo)
+    ), Possibilities, Costs),
+    min_list(Costs, Cost),
+    cache_cost(Shrimps, Cost), !.
+organize(_, _, inf).
+
+greedy_strat(_, Shrimps, 0) :- all_done(Shrimps), !.
+greedy_strat(Visited, Shrimps, Cost) :-
+    setof(next(CostTo, NextShrimps), (CostTo, NextShrimps)^(
+        move_something(Shrimps, NextShrimps, CostTo),
+        \+ member(NextShrimps, Visited)
+    ), Possibilities),
+    member(next(CostTo, NextShrimps), Possibilities),
+    organize([Shrimps | Visited], NextShrimps, CostFrom),
+    (CostFrom =:= inf -> Cost = inf ; Cost is CostFrom + CostTo).
+greedy_strat(_, _, inf).
+
+visit(Shrimps, _) :- closed(Shrimps), !.
+visit(Shrimps, Cost) :-
+    visited(Shrimps, Cost0),
+    Cost0 =< Cost, !.
+visit(Shrimps, Cost) :-
+    visited(Shrimps, Cost0),
+    Cost0 > Cost, !,
+    retract(visited(Shrimps, Cost0)),
+    assertz(visited(Shrimps, Cost)).
+visit(Shrimps, Cost) :- assertz(visited(Shrimps, Cost)).
+
+leave(Shrimps) :-
+    retract(visited(Shrimps, _)),
+    assertz(closed(Shrimps)).
+
+min_visited(Shrimps, Cost) :-
+    aggregate_all(min(Cost1, Shrimps1), visited(Shrimps1, Cost1), min(Cost, Shrimps)).
+
+expand(BaseCost, Shrimps) :-
+    findall(next(NextShrimps, CostTo), move_something(Shrimps, NextShrimps, CostTo), Possibilities),
+    maplist({BaseCost}/[next(NextShrimps, CostTo)]>>(
+        TotalCost is BaseCost + CostTo,
+        visit(NextShrimps, TotalCost)
+    ), Possibilities).
+
+dijkstra(Cost) :-
+    visited(Shrimps, Cost),
+    all_done(Shrimps), !.
+dijkstra(Cost) :-
+    min_visited(Shrimps, BaseCost),
+    write_debug("Shrimps", Shrimps),
+    expand(BaseCost, Shrimps),
+    leave(Shrimps),
+    dijkstra(Cost).
+
+start_dijkstra(Shrimps, Cost) :-
+    visit(Shrimps, 0),
+    dijkstra(Cost).
 
 p1 :-
-    read_input(State),
-    cheapest_organize(State, Cost),
+    Shrimps = [
+        shrimp(a, pos(a,1)),
+        shrimp(d, pos(a,2)),
+        shrimp(c, pos(b,1)),
+        shrimp(d, pos(b,2)),
+        shrimp(b, pos(c,1)),
+        shrimp(a, pos(c,2)),
+        shrimp(b, pos(d,1)),
+        shrimp(c, pos(d,2))    
+    ],
+    assertz(depth_levels([1,2])),
+    start_dijkstra(Shrimps, Cost),
+    write_answer(Cost).
+
+p2 :-
+    Shrimps = [
+        shrimp(a, pos(a,1)),
+        shrimp(d, pos(a,2)),
+        shrimp(d, pos(a,3)),
+        shrimp(d, pos(a,4)),
+        shrimp(c, pos(b,1)),
+        shrimp(c, pos(b,2)),
+        shrimp(b, pos(b,3)),
+        shrimp(d, pos(b,4)),
+        shrimp(b, pos(c,1)),
+        shrimp(b, pos(c,2)),
+        shrimp(a, pos(c,3)),
+        shrimp(a, pos(c,4)),
+        shrimp(b, pos(d,1)),
+        shrimp(a, pos(d,2)),
+        shrimp(c, pos(d,3)),
+        shrimp(c, pos(d,4)) 
+    ],
+    assertz(depth_levels([1,2,3,4])),
+    organize([], Shrimps, Cost),
     write_answer(Cost).
