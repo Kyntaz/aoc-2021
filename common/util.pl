@@ -20,6 +20,7 @@
     write_debug/1,
     write_debug/2
 ]).
+:- use_module(library(clpfd)).
 :- encoding(utf8).
 :- set_prolog_flag(color_term, true).
 :- set_stream(current_output, tty(true)).
@@ -82,11 +83,12 @@ productorium(L, X) :- operatorium(L, X, *).
 
 %! fact(+N:number, -Res:number) is det
 % Factorial of N.
-fact(0, 1)  :- !.
+fact(0, 1).
 fact(N, Fact) :-
-    N1 is N - 1,
-    fact(N1, Fact1),
-    Fact is Fact1 * N.
+    N #> 0,
+    N1 #= N - 1,
+    Fact #= Fact1 * N,
+    fact(N1, Fact1).
 
 %! remove_last(+List:list[any], -Res:list[any]) is det
 remove_last([_], []) :- !.
@@ -95,8 +97,8 @@ remove_last([X|Xs], [X|Ys]) :-
 
 %! replace(+Idx:number, +New:any, +List:list[any], -NewList:list[any]) is det
 % Replace element at index Idx with the new element.
-replace(_, _, [], []) :- !.
-replace(0, E, [_|T], [E|T]) :- !.
+replace(_, _, [], []).
+replace(0, E, [_|T], [E|T]).
 replace(N, O, [E|T1], [E|T2]) :-
     N1 is N - 1,
     replace(N1, O, T1, T2).
@@ -122,20 +124,20 @@ char_number(Char, N, MinC, MaxC, Disp) :-
     char_code(MaxC, Max),
     char_code(Char, Code),
     Code >= Min,
-    Code =< Max, !,
+    Code =< Max,
     N is Code - Min + Disp.
 
 %! char_number(+Char:char, -N:number) is det
 % Chars between 0 and 9 become their corresponding number.
 % Chars between a/A and z/Z become the corresponding number + 10 (mostly for hexadecimal).
-char_number(Char, N) :- char_number(Char, N, '0', '9', 0), !.
-char_number(Char, N) :- char_number(Char, N, 'a', 'z', 10), !.
-char_number(Char, N) :- char_number(Char, N, 'A', 'Z', 10), !.
+char_number(Char, N) :- char_number(Char, N, '0', '9', 0).
+char_number(Char, N) :- char_number(Char, N, 'a', 'z', 10).
+char_number(Char, N) :- char_number(Char, N, 'A', 'Z', 10).
 
 %! rev_base_chars_number(+Base:number, +Chars:list[char], -Number:number) is det
 % Turns a reversed list of characters into the corresponding number in base Base.
 % Mostly useful as a helper for base_chars_number.
-rev_base_chars_number(_, [], 0) :- !.
+rev_base_chars_number(_, [], 0).
 rev_base_chars_number(Base, [Char | Chars], Number) :-
     rev_base_chars_number(Base, Chars, Number1),
     char_number(Char, N),
