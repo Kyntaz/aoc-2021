@@ -100,7 +100,8 @@ remove_last([X|Xs], [X|Ys]) :-
 replace(_, _, [], []).
 replace(0, E, [_|T], [E|T]).
 replace(N, O, [E|T1], [E|T2]) :-
-    N1 is N - 1,
+    N #> 0,
+    N1 #= N - 1,
     replace(N1, O, T1, T2).
 
 %! no_duplicates(+List) is semidet

@@ -74,7 +74,7 @@ entry_to_nums((Input, Output), (InNums, OutNums)) :-
 
 %! count_nums_in_entry(+Nums, +Entry, -Count)
 count_nums_in_entry(Nums, (_, Output), Count) :-
-    (aggregate(count, N^(member(N, Nums), member(N, Output)), Count) ; Count = 0).
+    aggregate_all(count, (member(N, Nums), member(N, Output)), Count).
 
 %! digits_to_num(+Digits, ++0, -Num)
 digits_to_num([], Num, Num).

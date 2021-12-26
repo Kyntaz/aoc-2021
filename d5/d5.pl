@@ -39,7 +39,7 @@ vent_points(_, _, []).
 
 %! mark_point(+Point, +Map, -NewMap)
 mark_point(Point, Map, NewMap) :-
-    (get_assoc(Point, Map, V) ; V = 0),
+    (get_assoc(Point, Map, V) ; V = 0), !,
     V1 is V + 1,
     put_assoc(Point, Map, V1, NewMap).
 
@@ -64,8 +64,8 @@ p1 :-
     read_vents(Vents),
     empty_assoc(EmptyMap),
     mark_vents(false, Vents, EmptyMap, Map),
-    aggregate(count, (N, K)^(
-        gen_assoc(K, Map, N),
+    aggregate_all(count, (
+        gen_assoc(_, Map, N),
         N >= 2
     ), Overlaps),
     write_answer(Overlaps).
@@ -74,8 +74,8 @@ p2 :-
     read_vents(Vents),
     empty_assoc(EmptyMap),
     mark_vents(true, Vents, EmptyMap, Map),
-    aggregate(count, (N, K)^(
-        gen_assoc(K, Map, N),
+    aggregate_all(count, (
+        gen_assoc(_, Map, N),
         N >= 2
     ), Overlaps),
     write_answer(Overlaps).

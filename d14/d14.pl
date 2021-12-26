@@ -22,7 +22,7 @@ read_polymerization(Template, InsertionRules) :-
 
 %! increment_count(+Assoc, +Key, +N, -NewAssoc)
 increment_count(Assoc, Key, N, NewAssoc) :-
-    (get_assoc(Key, Assoc, Count) ; Count = 0),
+    (get_assoc(Key, Assoc, Count) ; Count = 0), !,
     Count1 is Count + N,
     put_assoc(Key, Assoc, Count1, NewAssoc).
 
@@ -60,6 +60,7 @@ replace_pairs(InsertionRules, Pairs, NewPairs, Occs, NewOccs) :-
 %! replace_steps(+InsertionRules, +Steps, +Pairs, -NewPairs, +Occs, -NewOccs)
 replace_steps(_, 0, Pairs, Pairs, Occs, Occs).
 replace_steps(InsertionRules, Steps, Pairs, NewPairs, Occs, NewOccs) :-
+    Steps > 0,
     replace_pairs(InsertionRules, Pairs, TempPairs, Occs, TempOccs),
     Steps1 is Steps - 1,
     replace_steps(InsertionRules, Steps1, TempPairs, NewPairs, TempOccs, NewOccs).

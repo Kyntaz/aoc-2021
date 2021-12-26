@@ -99,9 +99,9 @@ a_star(Matrix, EndPosition, FinalCost) :-
 
 p1 :-
     read_risk_matrix(RiskMatrix),
-    dimensions(Matrix, W, H),
+    dimensions(RiskMatrix, W, H),
     EndX is W - 1,
-    EndY is H - 1.
+    EndY is H - 1,
     assert_expanded((0,0), 0),
     a_star(RiskMatrix, (EndX, EndY), Cost),
     write_answer(Cost).

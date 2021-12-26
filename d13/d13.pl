@@ -53,7 +53,7 @@ initialize_grid(Dots, Grid) :-
     W is MaxX + 1,
     H is MaxY + 1,
     length(Grid, H),
-    maplist([List]>>(length(List, W)), Grid),
+    maplist({W}/[List]>>(length(List, W)), Grid),
     maplist(maplist(=(' ')), Grid).
 
 %! write_gridpoint(+Char)
@@ -81,5 +81,5 @@ p2 :-
     sort(FoldedDots, UniqueDots),
     initialize_grid(UniqueDots, Grid),
     dot_grid(FoldedDots, Grid, PrintedGrid),
-    write_answer("vvv"),
-    write_grid(PrintedGrid). 
+    write_answer(" "),
+    write_grid(PrintedGrid).

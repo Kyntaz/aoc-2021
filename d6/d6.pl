@@ -3,7 +3,7 @@
 
 %! count(+List, -Count)
 count(List, N, Count) :-
-    (aggregate(count, N^(member(N, List)), Count) ; Count = 0).
+    aggregate_all(count, member(N, List), Count).
 
 %! read_lanternfish(-Counts)
 read_lanternfish(Counts) :-
